@@ -6,7 +6,13 @@ public class RepositoryDTO {
     public String name;
     public String login;
     public List<BranchDTO> branches;
-    public boolean isFork() {
-        return false;
+    public static RepositoryDTO convert(RawRepositoryDTO rawRepository) {
+        RepositoryDTO repository = new RepositoryDTO();
+        repository.name = rawRepository.name;
+        repository.login = rawRepository.owner.login;
+        return repository;
+    }
+    public void setBranches(List<BranchDTO> branches) {
+        this.branches = branches;
     }
 }
