@@ -1,13 +1,14 @@
 package com.example.githubrepoapi.Controllers;
 
+import com.example.githubrepoapi.Models.DTOs.RepositoryDTO;
 import com.example.githubrepoapi.Services.GithubService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,8 +29,8 @@ public class GithubController {
                     Map.of("status", HttpStatus.NOT_FOUND.value(), "Message", "User not found")
             );
         }
+        HttpHeaders headers = new HttpHeaders();
         if (githubService.acceptHeaderIsNotJson(acceptHeader)) {
-            HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
@@ -37,7 +38,8 @@ public class GithubController {
                     .body(Map.of("status", HttpStatus.NOT_ACCEPTABLE.value(), "Message", "This header is not acceptable"));
         }
 
+        List<RepositoryDTO> repositories = githubService.getUserRepositories(username);
 
-        return ResponseEntity.accepted().body(username);
+        return ResponseEntity.ok(repositories);
     }
 }
