@@ -24,7 +24,7 @@ public class GithubController {
             @RequestHeader("Accept") String acceptHeader
             ) {
         if (githubService.acceptHeaderIsNotJson(acceptHeader)) {
-            //Setting the header to Json in order to give error message a proper Json format
+            //Setting the header to Json in order to send error message in a proper Json format
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 

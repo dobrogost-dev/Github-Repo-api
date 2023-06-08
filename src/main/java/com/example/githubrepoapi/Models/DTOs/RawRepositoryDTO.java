@@ -1,7 +1,5 @@
 package com.example.githubrepoapi.Models.DTOs;
 
-import java.util.List;
-
 public class RawRepositoryDTO {
     public String name;
     public OwnerDTO owner;

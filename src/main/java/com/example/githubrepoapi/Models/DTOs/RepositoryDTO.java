@@ -6,13 +6,11 @@ public class RepositoryDTO {
     public String name;
     public String login;
     public List<BranchDTO> branches;
-    public static RepositoryDTO generateFromRaw(RawRepositoryDTO rawRepository) {
+    public static RepositoryDTO generateFromRaw(RawRepositoryDTO rawRepository, List<BranchDTO> branches) {
         RepositoryDTO repository = new RepositoryDTO();
         repository.name = rawRepository.name;
         repository.login = rawRepository.owner.login;
+        repository.branches = branches;
         return repository;
-    }
-    public void setBranches(List<BranchDTO> branches) {
-        this.branches = branches;
     }
 }
