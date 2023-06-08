@@ -1,6 +1,7 @@
 package com.example.githubrepoapi.Services;
 
 import com.example.githubrepoapi.Models.DTOs.BranchDTO;
+import com.example.githubrepoapi.Models.DTOs.RawBranchDTO;
 import com.example.githubrepoapi.Models.DTOs.RawRepositoryDTO;
 import com.example.githubrepoapi.Models.DTOs.RepositoryDTO;
 import com.google.gson.Gson;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class GithubService {
     private static final Gson gson = new Gson();
     private static final String GITHUB_API_BASE_URL = "https://api.github.com";
+    private static final String token = "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";
     public boolean userNotFound(String username) {
         return false;
     }
@@ -36,6 +38,7 @@ public class GithubService {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(GITHUB_API_BASE_URL + "/users/" + username + "/repos"))
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + token)
                 .build();
 
         HttpResponse<String> response = null;
@@ -47,36 +50,40 @@ public class GithubService {
 
         if (response.statusCode() == HttpStatus.OK.value()) {
                 List<RawRepositoryDTO> rawRepositories = List.of(gson.fromJson(response.body(), RawRepositoryDTO[].class));
-                System.out.println(response.body());
                 rawRepositories.stream()
                             .filter(rawRepository -> !rawRepository.isFork())
                             .collect(Collectors.toList());
                 List<RepositoryDTO> repositories = new ArrayList<>();
                 for (RawRepositoryDTO rawRepository : rawRepositories) {
                     RepositoryDTO repository = RepositoryDTO.convert(rawRepository);
-                    repository.setBranches(getBranches(rawRepository.branches_url));
+                    List<RawBranchDTO> rawBranches = getRawBranches(rawRepository.branches_url);
+                    List<BranchDTO> branches = new ArrayList<>();
+                    for (RawBranchDTO rawBranch : rawBranches) {
+                        branches.add(new BranchDTO(rawBranch.name, rawBranch.commit.sha));
+                    }
+                    repository.setBranches(branches);
                     repositories.add(repository);
                 }
                 return repositories;
         }
         return Collections.emptyList();
     }
-    public List<BranchDTO> getBranches(String branches_url) {
+    public List<RawBranchDTO> getRawBranches(String branches_url) {
         branches_url = branches_url.replace("{/branch}", "");
         HttpClient httpClient = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(branches_url))
+                .header("Authorization", "Bearer " + token)
                 .build();
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                return gson.fromJson(response.body(), new TypeToken<List<BranchDTO>>() {}.getType());
+                return List.of(gson.fromJson(response.body(), RawBranchDTO[].class));
             }
         } catch (IOException | InterruptedException e) {
             System.out.println(e);
         }
-
         return Collections.emptyList();
     }
 }
