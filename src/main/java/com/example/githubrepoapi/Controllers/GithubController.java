@@ -1,13 +1,12 @@
 package com.example.githubrepoapi.Controllers;
 
+import com.example.githubrepoapi.Exceptions.UserNotFoundException;
 import com.example.githubrepoapi.Models.DTOs.RepositoryDTO;
 import com.example.githubrepoapi.Services.GithubService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Map;
 
@@ -37,8 +36,14 @@ public class GithubController {
                     .headers(headers)
                     .body(Map.of("status", HttpStatus.NOT_ACCEPTABLE.value(), "Message", "This header is not acceptable"));
         }
-
-        List<RepositoryDTO> repositories = githubService.getUserRepositories(username);
+        List<RepositoryDTO> repositories;
+        try {
+            repositories = githubService.getUserRepositories(username);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("status", HttpStatus.NOT_FOUND.value(), "Message", "User not found")
+            );
+        }
 
         return ResponseEntity.ok(repositories);
     }

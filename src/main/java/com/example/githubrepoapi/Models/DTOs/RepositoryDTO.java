@@ -6,7 +6,7 @@ public class RepositoryDTO {
     public String name;
     public String login;
     public List<BranchDTO> branches;
-    public static RepositoryDTO convert(RawRepositoryDTO rawRepository) {
+    public static RepositoryDTO generateFromRaw(RawRepositoryDTO rawRepository) {
         RepositoryDTO repository = new RepositoryDTO();
         repository.name = rawRepository.name;
         repository.login = rawRepository.owner.login;

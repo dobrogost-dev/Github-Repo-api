@@ -1,5 +1,6 @@
 package com.example.githubrepoapi.Services;
 
+import com.example.githubrepoapi.Exceptions.UserNotFoundException;
 import com.example.githubrepoapi.Models.DTOs.BranchDTO;
 import com.example.githubrepoapi.Models.DTOs.RawBranchDTO;
 import com.example.githubrepoapi.Models.DTOs.RawRepositoryDTO;
@@ -25,14 +26,14 @@ import java.util.stream.Collectors;
 public class GithubService {
     private static final Gson gson = new Gson();
     private static final String GITHUB_API_BASE_URL = "https://api.github.com";
-    private static final String token = "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";
+    private static final String token = "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";
     public boolean userNotFound(String username) {
         return false;
     }
     public boolean acceptHeaderIsNotJson(String acceptHeader) {
         return acceptHeader != null && !acceptHeader.contains("application/json");
     }
-    public List<RepositoryDTO> getUserRepositories(String username) {
+    public List<RepositoryDTO> getUserRepositories(String username) throws UserNotFoundException {
         HttpClient httpClient = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -47,7 +48,9 @@ public class GithubService {
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
-
+        if (response.statusCode() == 404) {
+            throw new UserNotFoundException("User not found");
+        }
         if (response.statusCode() == HttpStatus.OK.value()) {
                 List<RawRepositoryDTO> rawRepositories = List.of(gson.fromJson(response.body(), RawRepositoryDTO[].class));
                 rawRepositories.stream()
@@ -55,7 +58,7 @@ public class GithubService {
                             .collect(Collectors.toList());
                 List<RepositoryDTO> repositories = new ArrayList<>();
                 for (RawRepositoryDTO rawRepository : rawRepositories) {
-                    RepositoryDTO repository = RepositoryDTO.convert(rawRepository);
+                    RepositoryDTO repository = RepositoryDTO.generateFromRaw(rawRepository);
                     List<RawBranchDTO> rawBranches = getRawBranches(rawRepository.branches_url);
                     List<BranchDTO> branches = new ArrayList<>();
                     for (RawBranchDTO rawBranch : rawBranches) {
