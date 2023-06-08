@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class GithubService {
     private static final Gson gson = new Gson();
     private static final String GITHUB_API_BASE_URL = "https://api.github.com";
-    private static final String token = "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";
+    private static final String token = "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";
     public boolean userNotFound(String username) {
         return false;
     }
@@ -53,7 +53,7 @@ public class GithubService {
         }
         if (response.statusCode() == HttpStatus.OK.value()) {
                 List<RawRepositoryDTO> rawRepositories = List.of(gson.fromJson(response.body(), RawRepositoryDTO[].class));
-                rawRepositories.stream()
+                rawRepositories = rawRepositories.stream()
                             .filter(rawRepository -> !rawRepository.isFork())
                             .collect(Collectors.toList());
                 List<RepositoryDTO> repositories = new ArrayList<>();
