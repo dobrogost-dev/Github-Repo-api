@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class GithubService {
     private static final Gson gson = new Gson();
     private static final String GITHUB_API_BASE_URL = "https://api.github.com";
-    private static final String token = "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";
+    private static final String token = "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";
     public boolean acceptHeaderIsNotJson(String acceptHeader) {
         //I wasn't sure if i shouldn't use .equals()
         return acceptHeader != null && !acceptHeader.contains("application/json");
