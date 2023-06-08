@@ -50,3 +50,5 @@ How to run the project:
 1. Open the project with IntelliJ or other IDE
 2. Run the application
 3. Send the get request with username and accept header, you can use Postman to achieve this
+
+Used https://developer.github.com/v3 as a backing API
