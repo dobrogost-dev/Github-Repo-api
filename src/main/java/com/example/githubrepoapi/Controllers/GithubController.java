@@ -23,13 +23,9 @@ public class GithubController {
             @PathVariable("username") String username,
             @RequestHeader("Accept") String acceptHeader
             ) {
-        if (githubService.userNotFound(username)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    Map.of("status", HttpStatus.NOT_FOUND.value(), "Message", "User not found")
-            );
-        }
-        HttpHeaders headers = new HttpHeaders();
         if (githubService.acceptHeaderIsNotJson(acceptHeader)) {
+            //Setting the header to Json in order to give error message a proper Json format
+            HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
@@ -44,7 +40,6 @@ public class GithubController {
                     Map.of("status", HttpStatus.NOT_FOUND.value(), "Message", "User not found")
             );
         }
-
         return ResponseEntity.ok(repositories);
     }
 }

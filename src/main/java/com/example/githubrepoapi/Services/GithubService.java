@@ -6,7 +6,6 @@ import com.example.githubrepoapi.Models.DTOs.RawBranchDTO;
 import com.example.githubrepoapi.Models.DTOs.RawRepositoryDTO;
 import com.example.githubrepoapi.Models.DTOs.RepositoryDTO;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,10 +25,7 @@ import java.util.stream.Collectors;
 public class GithubService {
     private static final Gson gson = new Gson();
     private static final String GITHUB_API_BASE_URL = "https://api.github.com";
-    private static final String token = "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";
-    public boolean userNotFound(String username) {
-        return false;
-    }
+    private static final String token = "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";
     public boolean acceptHeaderIsNotJson(String acceptHeader) {
         return acceptHeader != null && !acceptHeader.contains("application/json");
     }
