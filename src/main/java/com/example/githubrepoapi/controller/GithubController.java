@@ -23,23 +23,6 @@ public class GithubController {
             @PathVariable("username") String username,
             @RequestHeader("Accept") String acceptHeader
             ) {
-        if (githubService.acceptHeaderIsNotJson(acceptHeader)) {
-            //Setting the header to Json in order to send error message in a proper Json format
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-                    .headers(headers)
-                    .body(Map.of("status", HttpStatus.NOT_ACCEPTABLE.value(), "Message", "This header is not acceptable"));
-        }
-        List<RepositoryDTO> repositories;
-        try {
-            repositories = githubService.getUserRepositories(username);
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    Map.of("status", HttpStatus.NOT_FOUND.value(), "Message", "User not found")
-            );
-        }
-        return ResponseEntity.ok(repositories);
+        return githubService.getUserRepositories(username, acceptHeader);
     }
 }
