@@ -2,11 +2,10 @@ package com.example.githubrepoapi.webclient;
 
 import com.example.githubrepoapi.exception.UserNotFoundException;
 import com.example.githubrepoapi.model.DTO.*;
-import com.google.gson.Gson;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -18,25 +17,30 @@ import java.util.stream.Collectors;
 public class GithubClient {
     private static final String GITHUB_API_BASE_URL = "https://api.github.com";
     private static final String token = "put token here";
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
     private final HttpHeaders headers;
-    public GithubClient(Gson gson, RestTemplate restTemplate, HttpHeaders httpHeaders) {
+    public GithubClient(RestTemplate restTemplate, HttpHeaders httpHeaders) {
         this.restTemplate = restTemplate;
         this.headers = httpHeaders;
         headers.set("Accept", "application/json");
         headers.set("Authorization", "Bearer " + token);
     }
+    public <T> ResponseEntity<List<T>> makeRequest(String url, ParameterizedTypeReference<List<T>> responseType) {
+        try {
+            RequestEntity<Void> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, URI.create(url));
+            return restTemplate.exchange(requestEntity, responseType);
+        } catch (HttpClientErrorException e) {
+            throw new UserNotFoundException("User not found");
+        }
+    }
     public List<RepositoryDTO> getUserRepositories(String username) throws UserNotFoundException {
         String url = GITHUB_API_BASE_URL + "/users/" + username + "/repos";
 
-        RequestEntity<Void> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, URI.create(url));
-        ResponseEntity<List<RawRepositoryDTO>> responseEntity = restTemplate.exchange(requestEntity,
-                new ParameterizedTypeReference<>() {});
+        ParameterizedTypeReference<List<RawRepositoryDTO>> responseType =
+                new ParameterizedTypeReference<>() {};
+        ResponseEntity<List<RawRepositoryDTO>> responseEntity = makeRequest(url, responseType);
         List<RawRepositoryDTO> rawRepositories = responseEntity.getBody();
 
-        if (responseEntity.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
-            throw new UserNotFoundException("User not found");
-        }
         if (!responseEntity.getStatusCode().equals(HttpStatus.OK)) {
             return Collections.emptyList();
         }
@@ -61,9 +65,9 @@ public class GithubClient {
     }
     public List<RawBranchDTO> getRawBranches(String branches_url) {
         branches_url = branches_url.replace("{/branch}", "");
-        RequestEntity<Void> requestEntity = new RequestEntity<>(headers, HttpMethod.GET, URI.create(branches_url));
-        ResponseEntity<List<RawBranchDTO>> responseEntity = restTemplate.exchange(requestEntity,
-                new ParameterizedTypeReference<>() {});
+        ParameterizedTypeReference<List<RawBranchDTO>> responseType =
+                new ParameterizedTypeReference<>() {};
+        ResponseEntity<List<RawBranchDTO>> responseEntity = makeRequest(branches_url, responseType);
         return responseEntity.getBody();
     }
 }
