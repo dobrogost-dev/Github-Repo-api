@@ -1,8 +1,8 @@
-package com.example.githubrepoapi.Controllers;
+package com.example.githubrepoapi.controller;
 
-import com.example.githubrepoapi.Exceptions.UserNotFoundException;
-import com.example.githubrepoapi.Models.DTOs.RepositoryDTO;
-import com.example.githubrepoapi.Services.GithubService;
+import com.example.githubrepoapi.exception.UserNotFoundException;
+import com.example.githubrepoapi.model.DTO.RepositoryDTO;
+import com.example.githubrepoapi.service.GithubService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;

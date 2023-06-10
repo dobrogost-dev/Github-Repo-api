@@ -1,4 +1,4 @@
-package com.example.githubrepoapi.Models.DTOs;
+package com.example.githubrepoapi.model.DTO;
 
 import java.util.List;
 

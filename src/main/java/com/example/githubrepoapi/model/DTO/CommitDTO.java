@@ -1,4 +1,4 @@
-package com.example.githubrepoapi.Models.DTOs;
+package com.example.githubrepoapi.model.DTO;
 
 public class CommitDTO {
     public String sha;
